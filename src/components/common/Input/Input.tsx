@@ -10,6 +10,7 @@ interface IProps {
   onChange: any;
   error: string;
   touched: boolean;
+  label: string;
 }
 
 const Input: React.FC<IProps> = ({
@@ -20,24 +21,30 @@ const Input: React.FC<IProps> = ({
   onChange,
   error,
   touched,
+  label,
 }) => {
   const styles = useStyles();
 
   return (
     <div className={styles.root}>
+      <label htmlFor={name} className={styles.label}>
+        {label}
+      </label>
       <input
+        id={name}
         name={name}
         type={type}
         className={styles.input}
         value={value}
         onBlur={onBlur}
         onChange={onChange}
+        autoComplete="off"
       />
-      <div className="form__icon-wrapper">
+      <div className={styles.iconWrapper}>
         {error && <IconOutlineInfo />}
         {touched && !error && <IconCheck />}
       </div>
-      {error && <div>{error}</div>}
+      {error && <div className={styles.errorText}>{error}</div>}
     </div>
   );
 };

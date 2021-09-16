@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Formik } from 'formik';
-import { Input } from 'components/common/Input';
+import { Input, Button } from 'components/common';
 import useStyles from './styles';
 
 interface LoginFormValues {
@@ -16,48 +16,53 @@ const LoginForm: React.FC = () => {
   });
 
   return (
-    <div>
-      <h1 className={styles.title}>Sign In</h1>
-      <p className={styles.subtitle}>New Here?</p>
-      <Formik
-        initialValues={userData}
-        validate={(values) => {
-          const errors: LoginFormValues = {
-            firstName: '',
-            password: '',
-          };
+    <Formik
+      initialValues={userData}
+      validate={(values) => {
+        const errors: LoginFormValues = {
+          firstName: '',
+          password: '',
+        };
 
-          if (!values.firstName) {
-            errors.firstName = 'Required field';
-          }
+        if (!values.firstName) {
+          errors.firstName = 'Required field';
+        }
 
-          if (!values.password) {
-            errors.password = 'Required field';
-          }
+        if (!values.password) {
+          errors.password = 'Required field';
+        }
 
-          return errors;
-        }}
-        enableReinitialize
-        onSubmit={(values, actions) => {
-          console.log('values: ', { values, actions });
-        }}
-      >
-        {({ errors, touched, values, handleBlur, handleChange }) => (
-          <form noValidate autoComplete="off" className="form">
-            <Input
-              name="firstName"
-              value={values.firstName}
-              onBlur={handleBlur}
-              onChange={handleChange}
-              error={errors.firstName}
-              touched={touched.firstName}
-            />
-
-            <div>LOGIN</div>
-          </form>
-        )}
-      </Formik>
-    </div>
+        return errors;
+      }}
+      enableReinitialize
+      onSubmit={(values, actions) => {
+        console.log('values: ', { values, actions });
+      }}
+    >
+      {({ errors, touched, values, handleBlur, handleChange }) => (
+        <form noValidate autoComplete="off" className={styles.form}>
+          <Input
+            name="firstName"
+            label="First name"
+            value={values.firstName}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            error={errors.firstName}
+            touched={touched.firstName}
+          />
+          <Input
+            name="password"
+            label="Password"
+            value={values.password}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            error={errors.password}
+            touched={touched.password}
+          />
+          <Button name="Continue" type="submit" />
+        </form>
+      )}
+    </Formik>
   );
 };
 
