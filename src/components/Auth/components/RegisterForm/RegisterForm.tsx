@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { Formik } from 'formik';
 import { Input, Button } from 'components/common';
 import { useHistory } from 'react-router-dom';
+import InputMask from 'react-input-mask';
+
+import { setLocalStorage } from 'utils/auth';
 import useStyles from './styles';
 
 interface RegisterFormValues {
@@ -15,19 +18,21 @@ interface RegisterFormValues {
 const RegisterForm: React.FC = () => {
   const styles = useStyles();
   const history = useHistory();
-  const [serverErrors, setServerErrors] = useState({});
 
-  const fetchRegisterUser = (values) => {
+  const fetchRegisterUser = (values, setErrors) => {
     axios
       .post(`${process.env.REACT_APP_API}register`, {
         ...values,
       })
-      .then((response) => {
+      .then(() => {
+        setLocalStorage('userRegistered', true);
         history.push('/login');
       })
       .catch((error) => {
         if (error.response) {
-          console.log('error.response.data: ', error.response.data);
+          setErrors({
+            [error.response.data.field]: error.response.data.errors,
+          });
         }
       });
   };
@@ -61,8 +66,8 @@ const RegisterForm: React.FC = () => {
 
         return errors;
       }}
-      onSubmit={(values) => {
-        fetchRegisterUser(values);
+      onSubmit={(values, { setErrors }) => {
+        fetchRegisterUser(values, setErrors);
       }}
       validateOnChange={false}
       validateOnBlur={false}
@@ -112,7 +117,17 @@ const RegisterForm: React.FC = () => {
             onChange={handleChange}
             error={errors.dateOfBirth}
             touched={touched.dateOfBirth}
+            type="number"
           />
+          <InputMask
+            mask="9999"
+            maskChar={null}
+            value={values.dateOfBirth}
+            onChange={handleChange}
+            placeholder="Enter your PIN"
+          >
+            {(inputProps) => <Input {...inputProps} />}
+          </InputMask>
           <Input
             name="password"
             label="Password"

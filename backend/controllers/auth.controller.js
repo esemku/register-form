@@ -2,8 +2,6 @@ const User = require('../models/auth.model');
 
 const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
-// Custom error handler to get useful error from database errors
-const { errorHandler } = require('../helpers/dbErrorHandling');
 
 exports.registerController = (req, res) => {
   const { firstName, lastName, dateOfBirth, password } = req.body;
@@ -11,8 +9,10 @@ exports.registerController = (req, res) => {
 
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
+    const field = errors.array().map((error) => error.param)[0];
     return res.status(422).json({
       errors: firstError,
+      field,
     });
   } else {
     User.findOne({
@@ -35,12 +35,7 @@ exports.registerController = (req, res) => {
     });
 
     user.save((err, user) => {
-      if (err) {
-        console.log('Save error', errorHandler(err));
-        return res.status(401).json({
-          errors: errorHandler(err),
-        });
-      } else {
+      if (!err) {
         return res.json({
           success: true,
           message: user,
@@ -66,12 +61,14 @@ exports.signinController = (req, res) => {
     }).exec((err, user) => {
       if (err || !user) {
         return res.status(400).json({
+          field: 'firstName',
           errors: 'User with that first name does not exist. Please signup',
         });
       }
       // authenticate
       if (!user.authenticate(password)) {
         return res.status(400).json({
+          field: 'password',
           errors: 'First name and password do not match',
         });
       }

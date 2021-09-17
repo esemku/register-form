@@ -4,10 +4,10 @@ import useStyles from './styles';
 
 interface IProps {
   name: string;
-  type?: 'text' | 'password';
-  value: string;
+  type?: 'text' | 'password' | 'number';
+  value?: string;
   onBlur: any;
-  onChange: any;
+  onChange?: any;
   error: string;
   touched: boolean;
   label: string;
@@ -51,6 +51,8 @@ const Input: React.FC<IProps> = ({
 
 Input.defaultProps = {
   type: 'text',
+  value: '',
+  onChange: 'a',
 };
 
 export default Input;

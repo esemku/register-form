@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Formik } from 'formik';
 import { Input, Button } from 'components/common';
-import { authenticate, isAuth } from 'utils/auth';
+import { authenticate, removeLocalStorage, isAuth } from 'utils/auth';
 import { useHistory } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import useStyles from './styles';
 
 interface LoginFormValues {
@@ -14,9 +15,8 @@ interface LoginFormValues {
 const LoginForm: React.FC = () => {
   const styles = useStyles();
   const history = useHistory();
-  const [serverErrors, setServerErrors] = useState({});
 
-  const fetchLoginUser = (values) => {
+  const fetchLoginUser = (values, setErrors) => {
     axios
       .post(`${process.env.REACT_APP_API}login`, {
         ...values,
@@ -29,9 +29,22 @@ const LoginForm: React.FC = () => {
         }
       })
       .catch((error) => {
-        console.log('error: ', error);
+        if (error.response) {
+          setErrors({
+            [error.response.data.field]: error.response.data.errors,
+          });
+        }
       });
   };
+
+  useEffect(() => {
+    if (localStorage.getItem('userRegistered')) {
+      toast.success('Now You can Sign In !', {
+        position: toast.POSITION.TOP_CENTER,
+      });
+      removeLocalStorage('userRegistered');
+    }
+  }, []);
 
   return (
     <Formik
@@ -53,8 +66,8 @@ const LoginForm: React.FC = () => {
         return errors;
       }}
       enableReinitialize
-      onSubmit={(values) => {
-        fetchLoginUser(values);
+      onSubmit={(values, { setErrors }) => {
+        fetchLoginUser(values, setErrors);
       }}
       validateOnChange={false}
       validateOnBlur={false}
@@ -92,6 +105,7 @@ const LoginForm: React.FC = () => {
             type="password"
           />
           <Button name="Continue" type="submit" />
+          <ToastContainer />
         </form>
       )}
     </Formik>
