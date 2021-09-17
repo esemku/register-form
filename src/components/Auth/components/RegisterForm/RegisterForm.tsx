@@ -1,34 +1,47 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Formik } from 'formik';
 import { Input, Button } from 'components/common';
+import { useHistory } from 'react-router-dom';
 import useStyles from './styles';
 
 interface RegisterFormValues {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  password: string;
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  password?: string;
 }
 
 const RegisterForm: React.FC = () => {
   const styles = useStyles();
-  const [userData, serUserData] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    password: '',
-  });
+  const history = useHistory();
+  const [serverErrors, setServerErrors] = useState({});
+
+  const fetchRegisterUser = (values) => {
+    axios
+      .post(`${process.env.REACT_APP_API}register`, {
+        ...values,
+      })
+      .then((response) => {
+        history.push('/login');
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log('error.response.data: ', error.response.data);
+        }
+      });
+  };
 
   return (
     <Formik
-      initialValues={userData}
+      initialValues={{
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        password: '',
+      }}
       validate={(values) => {
-        const errors: RegisterFormValues = {
-          firstName: '',
-          lastName: '',
-          dateOfBirth: '',
-          password: '',
-        };
+        const errors: RegisterFormValues = {};
 
         if (!values.firstName) {
           errors.firstName = 'Required field';
@@ -38,21 +51,35 @@ const RegisterForm: React.FC = () => {
           errors.lastName = 'Required field';
         }
 
+        if (!values.dateOfBirth) {
+          errors.dateOfBirth = 'Required field';
+        }
+
         if (!values.password) {
           errors.password = 'Required field';
         }
 
         return errors;
       }}
-      enableReinitialize
-      onSubmit={(values, actions) => {
-        console.log('values: ', { values, actions });
+      onSubmit={(values) => {
+        fetchRegisterUser(values);
       }}
       validateOnChange={false}
       validateOnBlur={false}
     >
-      {({ errors, touched, values, handleBlur, handleChange }) => (
-        <form noValidate autoComplete="off" className={styles.form}>
+      {({
+        errors,
+        touched,
+        values,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+      }) => (
+        <form
+          autoComplete="off"
+          className={styles.form}
+          onSubmit={handleSubmit}
+        >
           <div className={styles.pairInputsWrapper}>
             <div className={styles.inputWrapper}>
               <Input
@@ -94,6 +121,7 @@ const RegisterForm: React.FC = () => {
             onChange={handleChange}
             error={errors.password}
             touched={touched.password}
+            type="password"
           />
           <div className={styles.buttonWrapper}>
             <Button name="Submit" type="submit" />

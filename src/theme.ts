@@ -72,6 +72,7 @@ export const colors = {
   graySecondary: '#1e1e2d',
   grayTertiary: '#1b1b29',
   grayQuaternary: '#92929f',
+  grayQuinary: '#2b2b40',
   redPrimary: '#f64e60',
   whitePrimary: '#fff',
   bluePrimary: '#3699ff',

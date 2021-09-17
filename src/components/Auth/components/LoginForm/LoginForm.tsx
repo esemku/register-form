@@ -1,28 +1,46 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Formik } from 'formik';
 import { Input, Button } from 'components/common';
+import { authenticate, isAuth } from 'utils/auth';
+import { useHistory } from 'react-router-dom';
 import useStyles from './styles';
 
 interface LoginFormValues {
-  firstName: string;
-  password: string;
+  firstName?: string;
+  password?: string;
 }
 
 const LoginForm: React.FC = () => {
   const styles = useStyles();
-  const [userData, serUserData] = useState({
-    firstName: '',
-    password: '',
-  });
+  const history = useHistory();
+  const [serverErrors, setServerErrors] = useState({});
+
+  const fetchLoginUser = (values) => {
+    axios
+      .post(`${process.env.REACT_APP_API}login`, {
+        ...values,
+      })
+      .then((response) => {
+        const { token, user } = response.data;
+        authenticate(token, user);
+        if (isAuth()) {
+          history.push('/private');
+        }
+      })
+      .catch((error) => {
+        console.log('error: ', error);
+      });
+  };
 
   return (
     <Formik
-      initialValues={userData}
+      initialValues={{
+        firstName: '',
+        password: '',
+      }}
       validate={(values) => {
-        const errors: LoginFormValues = {
-          firstName: '',
-          password: '',
-        };
+        const errors: LoginFormValues = {};
 
         if (!values.firstName) {
           errors.firstName = 'Required field';
@@ -35,12 +53,25 @@ const LoginForm: React.FC = () => {
         return errors;
       }}
       enableReinitialize
-      onSubmit={(values, actions) => {
-        console.log('values: ', { values, actions });
+      onSubmit={(values) => {
+        fetchLoginUser(values);
       }}
+      validateOnChange={false}
+      validateOnBlur={false}
     >
-      {({ errors, touched, values, handleBlur, handleChange }) => (
-        <form noValidate autoComplete="off" className={styles.form}>
+      {({
+        errors,
+        touched,
+        values,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+      }) => (
+        <form
+          autoComplete="off"
+          className={styles.form}
+          onSubmit={handleSubmit}
+        >
           <Input
             name="firstName"
             label="First name"
@@ -58,6 +89,7 @@ const LoginForm: React.FC = () => {
             onChange={handleChange}
             error={errors.password}
             touched={touched.password}
+            type="password"
           />
           <Button name="Continue" type="submit" />
         </form>

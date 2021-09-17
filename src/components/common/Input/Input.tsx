@@ -4,7 +4,7 @@ import useStyles from './styles';
 
 interface IProps {
   name: string;
-  type?: 'text';
+  type?: 'text' | 'password';
   value: string;
   onBlur: any;
   onChange: any;

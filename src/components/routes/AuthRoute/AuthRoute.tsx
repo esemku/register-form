@@ -3,8 +3,6 @@ import { Route, Redirect } from 'react-router-dom';
 import { isAuth } from 'utils/auth';
 
 const AuthRoute = ({ layout, component, ...rest }: any) => {
-  console.log('AuthRoute: ', isAuth());
-
   return (
     <Route
       {...rest}
