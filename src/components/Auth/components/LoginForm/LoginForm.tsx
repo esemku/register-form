@@ -16,6 +16,7 @@ const LoginForm: React.FC = () => {
   const styles = useStyles();
   const history = useHistory();
 
+  // Try to connect with API to login
   const fetchLoginUser = (values, setErrors) => {
     axios
       .post(`${process.env.REACT_APP_API}login`, {
@@ -37,6 +38,7 @@ const LoginForm: React.FC = () => {
       });
   };
 
+  // After component did mount check if user is just registered and show notification
   useEffect(() => {
     if (localStorage.getItem('userRegistered')) {
       toast.success('Now You can Sign In !', {

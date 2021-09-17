@@ -1,9 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 import { Formik } from 'formik';
-import { Input, Button } from 'components/common';
+import { Input, Button, CustomInputMask } from 'components/common';
 import { useHistory } from 'react-router-dom';
-import InputMask from 'react-input-mask';
 
 import { setLocalStorage } from 'utils/auth';
 import useStyles from './styles';
@@ -19,6 +18,7 @@ const RegisterForm: React.FC = () => {
   const styles = useStyles();
   const history = useHistory();
 
+  // Try to connect with API to register user
   const fetchRegisterUser = (values, setErrors) => {
     axios
       .post(`${process.env.REACT_APP_API}register`, {
@@ -109,7 +109,7 @@ const RegisterForm: React.FC = () => {
               />
             </div>
           </div>
-          <Input
+          <CustomInputMask
             name="dateOfBirth"
             label="Date Of Birth"
             value={values.dateOfBirth}
@@ -117,17 +117,7 @@ const RegisterForm: React.FC = () => {
             onChange={handleChange}
             error={errors.dateOfBirth}
             touched={touched.dateOfBirth}
-            type="number"
           />
-          <InputMask
-            mask="9999"
-            maskChar={null}
-            value={values.dateOfBirth}
-            onChange={handleChange}
-            placeholder="Enter your PIN"
-          >
-            {(inputProps) => <Input {...inputProps} />}
-          </InputMask>
           <Input
             name="password"
             label="Password"

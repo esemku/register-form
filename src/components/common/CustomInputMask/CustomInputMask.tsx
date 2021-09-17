@@ -1,10 +1,10 @@
 import React from 'react';
 import { IconOutlineInfo, IconCheck } from 'components/common/icons';
+import InputMask from 'react-input-mask';
 import useStyles from './styles';
 
 interface IProps {
   name: string;
-  type?: 'text' | 'password' | 'number';
   value: string;
   onBlur: any;
   onChange: any;
@@ -13,9 +13,8 @@ interface IProps {
   label: string;
 }
 
-const Input: React.FC<IProps> = ({
+const CustomInputMask: React.FC<IProps> = ({
   name,
-  type,
   value,
   onBlur,
   onChange,
@@ -30,15 +29,15 @@ const Input: React.FC<IProps> = ({
       <label htmlFor={name} className={styles.label}>
         {label}
       </label>
-      <input
-        id={name}
+      <InputMask
+        mask="99/99/9999"
         name={name}
-        type={type}
-        className={styles.input}
         value={value}
         onBlur={onBlur}
         onChange={onChange}
-        autoComplete="off"
+        maskChar={null}
+        placeholder="dd/mm/yyyy"
+        className={styles.input}
       />
       <div className={styles.iconWrapper}>
         {error && <IconOutlineInfo />}
@@ -49,8 +48,4 @@ const Input: React.FC<IProps> = ({
   );
 };
 
-Input.defaultProps = {
-  type: 'text',
-};
-
-export default Input;
+export default CustomInputMask;
