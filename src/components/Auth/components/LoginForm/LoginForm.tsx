@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import axios from 'axios';
+import { Button, Input } from 'components/common';
 import { Formik } from 'formik';
-import { Input, Button } from 'components/common';
-import { authenticate, removeLocalStorage, isAuth } from 'utils/auth';
-import { useHistory } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useEffect } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { toast, ToastContainer } from 'react-toastify';
+import { clearRegister, login } from 'redux/actions/authActions';
+import { getIsRegistered } from 'redux/selectors/authSelectors';
 import useStyles from './styles';
 
 interface LoginFormValues {
@@ -14,39 +14,24 @@ interface LoginFormValues {
 
 const LoginForm: React.FC = () => {
   const styles = useStyles();
-  const history = useHistory();
+  const dispatch = useDispatch();
+  const isFetched = useSelector(getIsRegistered, shallowEqual);
 
-  // Try to connect with API to login
-  const fetchLoginUser = (values, setErrors) => {
-    axios
-      .post(`${process.env.REACT_APP_API}login`, {
-        ...values,
-      })
-      .then((response) => {
-        const { token, user } = response.data;
-        authenticate(token, user);
-        if (isAuth()) {
-          history.push('/private');
-        }
-      })
-      .catch((error) => {
-        if (error.response) {
-          setErrors({
-            [error.response.data.field]: error.response.data.errors,
-          });
-        }
-      });
+  // Action to run login saga
+  const loginUser = (formData, setErrors) => {
+    dispatch(login({ formData, setErrors }));
   };
 
-  // After component did mount check if user is just registered and show notification
+  // When register is successful (isFetched === true) show notification about sign in
+  // and clear redux (set default) for register
   useEffect(() => {
-    if (localStorage.getItem('userRegistered')) {
-      toast.success('Now You can Sign In !', {
+    if (isFetched) {
+      toast.success('Now You can Sign In!', {
         position: toast.POSITION.TOP_CENTER,
       });
-      removeLocalStorage('userRegistered');
+      dispatch(clearRegister());
     }
-  }, []);
+  }, [isFetched]);
 
   return (
     <Formik
@@ -69,7 +54,7 @@ const LoginForm: React.FC = () => {
       }}
       enableReinitialize
       onSubmit={(values, { setErrors }) => {
-        fetchLoginUser(values, setErrors);
+        loginUser(values, setErrors);
       }}
       validateOnChange={false}
       validateOnBlur={false}

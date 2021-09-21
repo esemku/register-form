@@ -20,4 +20,13 @@ export default makeStyles((theme: any) => ({
       fontSize: 14,
     },
   },
+  content: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: 50,
+  },
+  firstName: {
+    color: colors.whitePrimary,
+    fontSize: 30,
+  },
 }));

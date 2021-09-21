@@ -1,0 +1,13 @@
+// login
+export const LOGIN_REQUEST = 'AUTH_LOGIN_REQUEST';
+export const LOGIN_SUCCESS = 'AUTH_LOGIN_SUCCESS';
+export const LOGIN_ERROR = 'AUTH_LOGIN_ERROR';
+
+// register
+export const REGISTER_REQUEST = 'AUTH_REGISTER_REQUEST';
+export const REGISTER_SUCCESS = 'AUTH_REGISTER_SUCCESS';
+export const REGISTER_ERROR = 'AUTH_REGISTER_ERROR';
+export const REGISTER_CLEAR = 'AUTH_REGISTER_CLEAR';
+
+// logout
+export const LOGOUT = 'AUTH_LOGOUT';

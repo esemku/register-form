@@ -1,15 +1,18 @@
 import React from 'react';
-import { signOut } from 'utils/auth';
-import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from 'redux/actions/authActions';
+import { clearAllStorage } from 'utils/auth';
 import useStyles from './styles';
 
 const Home: React.FC = () => {
   const styles = useStyles();
-  const history = useHistory();
+  const dispatch = useDispatch();
+  const firstName = localStorage.getItem('firstName');
 
+  // Clear all data from local storage and run logout action
   const handleSignOut = () => {
-    signOut();
-    history.push('/');
+    clearAllStorage();
+    dispatch(logout());
   };
 
   return (
@@ -24,6 +27,9 @@ const Home: React.FC = () => {
         >
           Log out
         </div>
+      </div>
+      <div className={styles.content}>
+        <p className={styles.firstName}>Logged as {firstName} </p>
       </div>
     </div>
   );

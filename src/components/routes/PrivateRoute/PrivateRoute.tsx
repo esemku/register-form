@@ -1,13 +1,16 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { isAuth } from 'utils/auth';
+import { shallowEqual, useSelector } from 'react-redux';
+import { getIsAuthenticated } from 'redux/selectors/authSelectors';
 
 const PrivateRoute = ({ component, ...rest }: any) => {
+  const { isAuthenticated } = useSelector(getIsAuthenticated, shallowEqual);
+
   return (
     <Route
       {...rest}
       render={(props) =>
-        isAuth() ? (
+        isAuthenticated ? (
           React.createElement(component, props)
         ) : (
           <Redirect

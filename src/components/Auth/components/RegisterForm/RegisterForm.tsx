@@ -1,10 +1,13 @@
-import React from 'react';
-import axios from 'axios';
+import { Button, CustomInputMask, Input } from 'components/common';
 import { Formik } from 'formik';
-import { Input, Button, CustomInputMask } from 'components/common';
+import React, { useEffect } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-
-import { setLocalStorage } from 'utils/auth';
+import { register } from 'redux/actions/authActions';
+import {
+  getIsRegistered,
+  getIsRegisteredError,
+} from 'redux/selectors/authSelectors';
 import useStyles from './styles';
 
 interface RegisterFormValues {
@@ -16,26 +19,23 @@ interface RegisterFormValues {
 
 const RegisterForm: React.FC = () => {
   const styles = useStyles();
+  const dispatch = useDispatch();
+  const isFetched = useSelector(getIsRegistered, shallowEqual);
+  const isRegisterError = useSelector(getIsRegisteredError, shallowEqual);
   const history = useHistory();
 
-  // Try to connect with API to register user
-  const fetchRegisterUser = (values, setErrors) => {
-    axios
-      .post(`${process.env.REACT_APP_API}register`, {
-        ...values,
-      })
-      .then(() => {
-        setLocalStorage('userRegistered', true);
-        history.push('/login');
-      })
-      .catch((error) => {
-        if (error.response) {
-          setErrors({
-            [error.response.data.field]: error.response.data.errors,
-          });
-        }
-      });
+  // Action to run register saga
+  const registerUser = (formData, setErrors) => {
+    dispatch(register({ formData, setErrors }));
   };
+
+  // When register is successful (isFetched === true) and register doesn't have errors
+  // redirect to login page
+  useEffect(() => {
+    if (isFetched && !isRegisterError) {
+      history.push('/login');
+    }
+  }, [isFetched]);
 
   return (
     <Formik
@@ -67,7 +67,7 @@ const RegisterForm: React.FC = () => {
         return errors;
       }}
       onSubmit={(values, { setErrors }) => {
-        fetchRegisterUser(values, setErrors);
+        registerUser(values, setErrors);
       }}
       validateOnChange={false}
       validateOnBlur={false}

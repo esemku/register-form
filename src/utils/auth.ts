@@ -1,53 +1,71 @@
-import cookie from 'js-cookie';
-
-// Set in cookie
-export const setCookie = (key, value) => {
-  cookie.set(key, value, {
-    // 1 Day
-    expires: 1,
-  });
+export const storeAuthData = ({ token, firstName }) => {
+  setStorage('token', token);
+  setStorage('firstName', firstName);
 };
 
-// Remove from cookie
-export const removeCookie = (key) => {
-  cookie.remove(key, {
-    expires: 1,
-  });
+export const clearAllStorage = () => {
+  removeStorage('token');
+  removeStorage('firstName');
 };
 
-// Get from cookie
-export const getCookie = (key) => {
-  return cookie.get(key);
+export const hasAuthTokens = () => getStorage('token') !== null;
+
+export const setStorage = (key, value, expires = 24 * 60 * 60) => {
+  const now = Date.now();
+  const schedule = now + expires * 1000;
+  try {
+    localStorage.setItem(key, value);
+    localStorage.setItem(`${key}_expiresIn`, String(schedule));
+  } catch (e) {
+    console.log(
+      `setStorage: Error setting key [${key}] in localStorage: ${JSON.stringify(
+        e,
+      )}`,
+    );
+    return false;
+  }
+  return true;
 };
 
-// Set in localstorage
-export const setLocalStorage = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
+export const removeStorage = (key) => {
+  try {
+    localStorage.setItem(key, '');
+    localStorage.setItem(`${key}_expiresIn`, '');
+  } catch (e) {
+    console.log(
+      `removeStorage: Error removing key [${key}] from localStorage: ${JSON.stringify(
+        e,
+      )}`,
+    );
+    return false;
+  }
+  return true;
 };
 
-// Remove from localstorage
-export const removeLocalStorage = (key) => {
-  localStorage.removeItem(key);
-};
+export const getStorage = (key) => {
+  const now = Date.now(); // epoch time, lets deal only with integer
+  // set expiration for storage
+  let expiresIn = Number(localStorage.getItem(`${key}_expiresIn`));
+  if (expiresIn === undefined || expiresIn === null) {
+    expiresIn = 0;
+  }
 
-// Authenticate user by passing data to cookie and localstorage during signin
-export const authenticate = (token, user) => {
-  setCookie('token', token);
-  setLocalStorage('user', user);
-};
-
-// Access user info from localstorage
-export const isAuth = () => {
-  const cookieChecked = getCookie('token');
-  if (cookieChecked) {
-    if (localStorage.getItem('user')) {
-      return JSON.parse(localStorage.getItem('user'));
+  expiresIn = Math.abs(expiresIn);
+  if (expiresIn < now) {
+    // Expired
+    removeStorage(key);
+  } else {
+    try {
+      const value = localStorage.getItem(key);
+      return value;
+    } catch (e) {
+      console.log(
+        `getStorage: Error reading key [${key}] from localStorage: ${JSON.stringify(
+          e,
+        )}`,
+      );
+      return null;
     }
   }
-  return false;
-};
-
-export const signOut = () => {
-  removeCookie('token');
-  removeLocalStorage('user');
+  return null;
 };
