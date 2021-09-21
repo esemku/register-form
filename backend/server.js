@@ -11,15 +11,17 @@ const PORT = process.env.PORT;
 app.use(express.json());
 
 // Config for only development
-if (process.env.NODE_ENV === 'development') {
-  app.use(
-    cors({
-      origin: process.env.CLIENT_URL,
-    }),
-  );
+// if (process.env.NODE_ENV === 'development') {
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+  }),
+);
 
-  app.use(morgan('dev'));
-}
+app.use(morgan('dev'));
+// }
+
+app.use(express.static('public'));
 
 // Load all routes
 const authRouter = require('./routes/auth.route');

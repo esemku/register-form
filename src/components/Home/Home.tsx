@@ -29,7 +29,7 @@ const Home: React.FC = () => {
         </div>
       </div>
       <div className={styles.content}>
-        <p className={styles.firstName}>Logged as {firstName} </p>
+        <p className={styles.firstName}>Logged as {firstName}</p>
       </div>
     </div>
   );
